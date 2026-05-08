@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-config
+data:
+  MYSQL_DATABASE: aeropuerto_db
+  MYSQL_USER: aeropuerto_user
+  MYSQL_PASSWORD: securepassword
+  MYSQL_ROOT_PASSWORD: rootpassword

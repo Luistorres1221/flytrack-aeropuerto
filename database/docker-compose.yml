@@ -1,0 +1,38 @@
+version: '3.9'
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: aeropuerto-mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: aeropuerto_db
+      MYSQL_USER: aeropuerto_user
+      MYSQL_PASSWORD: securepassword
+      MYSQL_ROOT_PASSWORD: rootpassword
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+  backend:
+    build: ../backend
+    container_name: aeropuerto-backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/aeropuerto_db
+      SPRING_DATASOURCE_USERNAME: aeropuerto_user
+      SPRING_DATASOURCE_PASSWORD: securepassword
+
+  frontend:
+    build: ../frontend
+    container_name: aeropuerto-frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+volumes:
+  mysql-data:
