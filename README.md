@@ -163,6 +163,7 @@ La API está completamente documentada con **Swagger/OpenAPI 3.0**.
 - **OpenAPI JSON**: `http://localhost:8080/v3/api-docs`
 
 ### Características de la documentación:
+- ✅ **Acceso público** - No requiere autenticación
 - ✅ Descripciones detalladas de todos los endpoints
 - ✅ Parámetros y respuestas documentadas
 - ✅ Códigos de estado HTTP explicados
