@@ -34,6 +34,10 @@ public class Pasajero {
     @Column(unique = true)
     private String numeroPasaporte;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "vuelo_id")
+    private Vuelo vuelo;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime fechaCreacion;
 
@@ -114,5 +118,13 @@ public class Pasajero {
 
     public void setFechaActualizacion(LocalDateTime fechaActualizacion) {
         this.fechaActualizacion = fechaActualizacion;
+    }
+
+    public Vuelo getVuelo() {
+        return vuelo;
+    }
+
+    public void setVuelo(Vuelo vuelo) {
+        this.vuelo = vuelo;
     }
 }
