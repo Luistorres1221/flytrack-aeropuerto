@@ -61,7 +61,7 @@ FlyTrack es un proyecto full-stack completo para gestionar operaciones de aeropu
 │   ├── src/main/java/... # controladores, servicios, repositorios y entidades
 │   ├── pom.xml          # dependencias y configuración de Maven
 │   └── ...
-├── frontend/             # Aplicación React + Vite
+├── front/               # Aplicación React + Vite (anteriormente 'frontend')
 │   ├── src/             # componentes, páginas y estilos
 │   ├── package.json
 │   └── ...
@@ -73,7 +73,17 @@ FlyTrack es un proyecto full-stack completo para gestionar operaciones de aeropu
 └── README.md             # documentación del proyecto
 ```
 
-## 🛠️ Tecnologías Principales
+## � Cambios Recientes
+
+### v1.1.0 - Refactorización del Frontend
+- ✅ Eliminada carpeta `frontend` duplicada
+- ✅ Renombrada carpeta principal a `front`
+- ✅ Actualizados archivos de Kubernetes para usar `front`
+- ✅ Cambiado frontend para conectarse directamente al backend Spring Boot
+- ✅ Reemplazado `@vitejs/plugin-react-swc` por `@vitejs/plugin-react` para evitar errores de binding nativo
+- ✅ Agregada variable `VITE_API_URL` para configuración de conexión al backend
+
+## �🛠️ Tecnologías Principales
 
 ### Backend
 - **Java 21** - Lenguaje de programación
@@ -144,12 +154,59 @@ mvn spring-boot:run
 ### 3. Ejecutar el frontend
 
 ```bash
-cd frontend
+cd front
 npm install
 npm run dev
 ```
 
-El frontend se ejecuta generalmente en `http://localhost:5173`.
+El frontend estará disponible en `http://localhost:8084` (o el puerto que Vite asigne).
+
+**Nota**: El frontend está configurado para conectarse al backend Spring Boot en lugar de Supabase. Asegúrate de que el backend esté corriendo antes de usar el frontend.
+
+## 🚀 Ejecución Completa del Proyecto
+
+### Opción 1: Todo con Docker (Recomendado para desarrollo completo)
+
+```bash
+# Desde la raíz del proyecto
+docker compose -f database/docker-compose.yml up -d
+cd backend && mvn spring-boot:run &
+cd ../front && npm install && npm run dev &
+```
+
+### Opción 2: Desarrollo híbrido (Backend con MySQL, Frontend con Vite)
+
+```bash
+# Terminal 1: Base de datos
+cd database
+docker compose up -d mysql
+
+# Terminal 2: Backend
+cd ../backend
+mvn spring-boot:run
+
+# Terminal 3: Frontend
+cd ../front
+npm install
+npm run dev
+```
+
+### URLs de acceso:
+- **Backend API**: http://localhost:8081
+- **Frontend**: http://localhost:8084
+- **Base de datos MySQL**: localhost:3306
+
+## 🐳 Despliegue con Kubernetes
+
+Para desplegar en un clúster de Kubernetes:
+
+```bash
+kubectl apply -f k8s/
+```
+
+Los servicios estarán disponibles en:
+- Frontend: `http://<cluster-ip>:30080`
+- Backend: `http://<cluster-ip>:30081`
 
 ## 🧪 Comandos de Testing
 
