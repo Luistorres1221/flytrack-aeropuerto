@@ -1,5 +1,6 @@
 package com.example.backend.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
@@ -36,6 +37,7 @@ public class Pasajero {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vuelo_id")
+    @JsonIgnore
     private Vuelo vuelo;
 
     @Column(nullable = false, updatable = false)

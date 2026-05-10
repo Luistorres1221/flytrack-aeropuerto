@@ -161,6 +161,12 @@ npm run dev
 
 El frontend estará disponible en `http://localhost:8084` (o el puerto que Vite asigne).
 
+#### Usuario administrador local
+- Correo: `admin@flytrack.com`
+- Contraseña: `admin123*`
+
+Este usuario administrativo está disponible localmente en la aplicación, y permite acceder a la ruta de administración sin depender de Supabase.
+
 **Nota**: El frontend está configurado para conectarse al backend Spring Boot en lugar de Supabase. Asegúrate de que el backend esté corriendo antes de usar el frontend.
 
 ## 🚀 Ejecución Completa del Proyecto

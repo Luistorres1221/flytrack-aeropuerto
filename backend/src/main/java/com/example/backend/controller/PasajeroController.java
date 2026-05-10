@@ -16,7 +16,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/pasajeros")
-@CrossOrigin(origins = "*")
 @Tag(name = "Pasajeros", description = "Gestión de pasajeros del aeropuerto")
 public class PasajeroController {
 

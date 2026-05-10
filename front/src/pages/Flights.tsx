@@ -12,28 +12,46 @@ type Flight = {
   departure_time: string;
   arrival_time: string;
   gate: string | null;
-  status: "on_time" | "delayed" | "cancelled" | "boarding" | "departed";
+  terminal: string | null;
+  boarding_time: string | null;
+  airline: string;
+  status: "PROGRAMADO" | "EN_VUELO" | "ABORDANDO" | "RETRASADO" | "CANCELADO" | "COMPLETADO";
 };
 
 const statusLabel: Record<Flight["status"], string> = {
-  on_time: "A tiempo", delayed: "Retrasado", cancelled: "Cancelado",
-  boarding: "Abordando", departed: "Despegó",
+  PROGRAMADO: "A tiempo",
+  EN_VUELO: "En vuelo",
+  ABORDANDO: "Abordando",
+  RETRASADO: "Retrasado",
+  CANCELADO: "Cancelado",
+  COMPLETADO: "Completado",
 };
 const statusVariant: Record<Flight["status"], "default" | "destructive" | "secondary" | "outline"> = {
-  on_time: "default", delayed: "secondary", cancelled: "destructive",
-  boarding: "outline", departed: "secondary",
+  PROGRAMADO: "default",
+  EN_VUELO: "secondary",
+  ABORDANDO: "secondary",
+  RETRASADO: "destructive",
+  CANCELADO: "destructive",
+  COMPLETADO: "outline",
 };
 
-const fmt = (iso: string) => new Date(iso).toLocaleString("es-ES", { dateStyle: "short", timeStyle: "short" });
+const fmt = (iso: string) => new Date(iso.replace(" ", "T")).toLocaleString("es-ES", { dateStyle: "short", timeStyle: "short" });
 
 const Flights = () => {
   const [flights, setFlights] = useState<Flight[]>([]);
   const [q, setQ] = useState("");
   const [date, setDate] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   const load = async () => {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/vuelos`);
+      if (!response.ok) {
+        const message = `Error ${response.status}: ${response.statusText}`;
+        setError(message);
+        console.error(message);
+        return;
+      }
       const data = await response.json();
       const mappedFlights = data.map((v: any) => ({
         id: v.id.toString(),
@@ -42,12 +60,17 @@ const Flights = () => {
         destination: v.destino,
         departure_time: v.fechaSalida,
         arrival_time: v.fechaLlegada,
-        gate: v.puerta,
-        status: v.estado
+        gate: v.puerta ?? null,
+        terminal: v.terminal ?? null,
+        boarding_time: v.horaAbordaje ?? null,
+        airline: v.aerolinea,
+        status: (v.estado as Flight['status']) ?? 'PROGRAMADO'
       }));
       setFlights(mappedFlights);
+      setError(null);
     } catch (error) {
       console.error("Error loading flights:", error);
+      setError("No se pudo cargar la lista de vuelos. Revisa la conexión con el backend.");
     }
   };
 
@@ -75,19 +98,37 @@ const Flights = () => {
         <div className="text-sm text-muted-foreground self-center">{filtered.length} vuelo(s)</div>
       </div>
 
+      {error && (
+        <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-4 text-sm text-destructive">
+          {error}
+        </div>
+      )}
+
       <div className="space-y-3">
         {filtered.map((f) => (
           <Card key={f.id} className="p-5 flex flex-col md:flex-row md:items-center gap-4">
-            <div className="md:w-28 font-mono font-bold text-lg">{f.flight_number}</div>
+            <div className="md:w-28">
+              <div className="font-mono font-bold text-lg">{f.flight_number}</div>
+              <div className="text-xs text-muted-foreground">{f.airline}</div>
+            </div>
             <div className="md:flex-1">
               <div className="font-medium">{f.origin} → {f.destination}</div>
               <div className="text-xs text-muted-foreground font-mono">
                 Salida {fmt(f.departure_time)} · Llegada {fmt(f.arrival_time)}
               </div>
+              <div className="text-xs text-muted-foreground font-mono mt-2">
+                Puerta {f.gate ?? "—"} · Terminal {f.terminal ?? "—"}
+              </div>
+              {f.boarding_time && (
+                <div className="text-xs text-muted-foreground font-mono">
+                  Abordaje {fmt(f.boarding_time)}
+                </div>
+              )}
             </div>
-            <div className="md:w-24 text-sm">
+            <div className="md:w-28 text-sm">
               <span className="text-xs text-muted-foreground">PUERTA</span>
               <div className="font-mono font-semibold">{f.gate ?? "—"}</div>
+              <div className="text-xs text-muted-foreground">Terminal {f.terminal ?? "—"}</div>
             </div>
             <Badge variant={statusVariant[f.status]}>{statusLabel[f.status]}</Badge>
           </Card>

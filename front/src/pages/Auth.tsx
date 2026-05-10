@@ -9,6 +9,9 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 
+const ADMIN_EMAIL = "admin@flytrack.com";
+const ADMIN_PASSWORD = "admin123*";
+
 const schema = z.object({
   email: z.string().trim().email("Correo inválido").max(255),
   password: z.string().min(6, "Mínimo 6 caracteres").max(100),
@@ -16,7 +19,7 @@ const schema = z.object({
 });
 
 const Auth = () => {
-  const { user } = useAuth();
+  const { user, loginLocalAdmin } = useAuth();
   const nav = useNavigate();
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [email, setEmail] = useState("");
@@ -36,6 +39,11 @@ const Auth = () => {
     setBusy(true);
     try {
       if (mode === "signup") {
+        if (email === ADMIN_EMAIL) {
+          toast.error("La cuenta de administrador ya está protegida y no puede registrarse aquí.");
+          return;
+        }
+
         const { error } = await supabase.auth.signUp({
           email, password,
           options: {
@@ -47,6 +55,13 @@ const Auth = () => {
         toast.success("Cuenta creada. Ya puedes iniciar sesión.");
         setMode("login");
       } else {
+        if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+          loginLocalAdmin();
+          toast.success("Bienvenido administrador");
+          nav("/");
+          return;
+        }
+
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         toast.success("Bienvenido");

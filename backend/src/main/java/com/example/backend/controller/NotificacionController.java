@@ -16,7 +16,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/notificaciones")
-@CrossOrigin(origins = "*")
 @Tag(name = "Notificaciones", description = "Gestión de notificaciones del aeropuerto")
 public class NotificacionController {
 

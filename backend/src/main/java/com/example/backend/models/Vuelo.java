@@ -1,5 +1,6 @@
 package com.example.backend.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
@@ -36,10 +37,28 @@ public class Vuelo {
     @Enumerated(EnumType.STRING)
     private EstadoVuelo estado;
 
+    @NotBlank(message = "La puerta es obligatoria")
+    @Size(min = 1, max = 10, message = "La puerta debe tener entre 1 y 10 caracteres")
+    @Column(name = "puerta")
+    private String puerta;
+
+    @NotBlank(message = "La terminal es obligatoria")
+    @Size(min = 1, max = 20, message = "La terminal debe tener entre 1 y 20 caracteres")
+    @Column(name = "terminal")
+    private String terminal;
+
+    @NotNull(message = "La hora de abordaje es obligatoria")
+    @Column(name = "hora_abordaje")
+    private LocalDateTime horaAbordaje;
+    @NotBlank(message = "La aerolínea es obligatoria")
+    @Size(min = 2, max = 50, message = "La aerolínea debe tener entre 2 y 50 caracteres")
+    @Column(name = "aerolinea")
+    private String aerolinea;
     @Min(value = 1, message = "La capacidad debe ser al menos 1")
     private Integer capacidad;
 
     @OneToMany(mappedBy = "vuelo", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Pasajero> pasajeros;
 
     @Column(nullable = false, updatable = false)
@@ -60,7 +79,7 @@ public class Vuelo {
     }
 
     public enum EstadoVuelo {
-        PROGRAMADO, EN_VUELO, RETRASADO, CANCELADO, COMPLETADO
+        PROGRAMADO, EN_VUELO, ABORDANDO, RETRASADO, CANCELADO, COMPLETADO
     }
 
     // Getters and Setters
@@ -118,6 +137,38 @@ public class Vuelo {
 
     public void setEstado(EstadoVuelo estado) {
         this.estado = estado;
+    }
+
+    public String getPuerta() {
+        return puerta;
+    }
+
+    public void setPuerta(String puerta) {
+        this.puerta = puerta;
+    }
+
+    public String getTerminal() {
+        return terminal;
+    }
+
+    public void setTerminal(String terminal) {
+        this.terminal = terminal;
+    }
+
+    public LocalDateTime getHoraAbordaje() {
+        return horaAbordaje;
+    }
+
+    public void setHoraAbordaje(LocalDateTime horaAbordaje) {
+        this.horaAbordaje = horaAbordaje;
+    }
+
+    public String getAerolinea() {
+        return aerolinea;
+    }
+
+    public void setAerolinea(String aerolinea) {
+        this.aerolinea = aerolinea;
     }
 
     public Integer getCapacidad() {
