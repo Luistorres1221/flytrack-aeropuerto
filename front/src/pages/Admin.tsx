@@ -44,7 +44,8 @@ const Admin = () => {
       const response = await fetch(apiUrl("/api/vuelos"));
       if (!response.ok) throw new Error('Error al cargar vuelos');
       const data = await response.json();
-      const mappedFlights = data.map((v: any) => ({
+      const list = Array.isArray(data) ? data : [];
+      const mappedFlights = list.map((v: any) => ({
         id: v.id.toString(),
         flight_number: v.codigoVuelo,
         origin: v.origen,
@@ -69,7 +70,7 @@ const Admin = () => {
       const response = await fetch(apiUrl("/api/equipajes"));
       if (!response.ok) throw new Error('Error al cargar equipajes');
       const data = await response.json();
-      setEquipajes(data);
+      setEquipajes(Array.isArray(data) ? data : []);
     } catch (error) {
       toast.error('Error al cargar equipajes');
       console.error(error);

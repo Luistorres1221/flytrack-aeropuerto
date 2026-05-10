@@ -95,7 +95,7 @@ const Baggage = () => {
       const response = await fetch(apiUrl("/api/equipajes"));
       if (!response.ok) throw new Error('Error al cargar equipajes');
       const data = await response.json();
-      setEquipajes(data);
+      setEquipajes(Array.isArray(data) ? data : []);
     } catch (error) {
       toast.error('Error al cargar equipajes');
       console.error(error);
@@ -182,20 +182,20 @@ const Baggage = () => {
           <CardContent>
             <form onSubmit={submit} className="space-y-4">
               <div>
-                <Label>Número de etiqueta</Label>
-                <Input value={form.numeroEtiqueta} onChange={(e) => setForm({ ...form, numeroEtiqueta: e.target.value })} placeholder="ABC123" required />
+                <Label htmlFor="baggage-numero-etiqueta">Número de etiqueta</Label>
+                <Input id="baggage-numero-etiqueta" value={form.numeroEtiqueta} onChange={(e) => setForm({ ...form, numeroEtiqueta: e.target.value })} placeholder="ABC123" required />
               </div>
               <div>
-                <Label>ID del vuelo</Label>
-                <Input value={form.vueloId} onChange={(e) => setForm({ ...form, vueloId: e.target.value })} placeholder="1" required />
+                <Label htmlFor="baggage-vuelo-id">ID del vuelo</Label>
+                <Input id="baggage-vuelo-id" value={form.vueloId} onChange={(e) => setForm({ ...form, vueloId: e.target.value })} placeholder="1" required />
               </div>
               <div>
-                <Label>ID del pasajero</Label>
-                <Input value={form.pasajeroId} onChange={(e) => setForm({ ...form, pasajeroId: e.target.value })} placeholder="1" required />
+                <Label htmlFor="baggage-pasajero-id">ID del pasajero</Label>
+                <Input id="baggage-pasajero-id" value={form.pasajeroId} onChange={(e) => setForm({ ...form, pasajeroId: e.target.value })} placeholder="1" required />
               </div>
               <div>
-                <Label>Descripción del equipaje</Label>
-                <Textarea rows={4} value={form.descripcion} onChange={(e) => setForm({ ...form, descripcion: e.target.value })} placeholder="Color, marca, contenido..." required />
+                <Label htmlFor="baggage-descripcion">Descripción del equipaje</Label>
+                <Textarea id="baggage-descripcion" rows={4} value={form.descripcion} onChange={(e) => setForm({ ...form, descripcion: e.target.value })} placeholder="Color, marca, contenido..." required />
               </div>
               <Button type="submit" disabled={busy}>{busy ? "Registrando..." : "Registrar equipaje"}</Button>
             </form>
