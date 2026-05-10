@@ -149,55 +149,6 @@ const Baggage = () => {
     encontrado: equipajes.filter(e => e.estado === "ENCONTRADO").length,
     entregado: equipajes.filter(e => e.estado === "ENTREGADO").length,
   }), [equipajes]);
-    const { data } = await supabase.from("baggage_reports").select("*").eq("user_id", user!.id).order("created_at", { ascending: false });
-    setReports((data as Report[]) || []);
-  };
-  useEffect(() => { if (user) load(); /* eslint-disable-next-line */ }, [user]);
-
-  // Realtime updates so the tracker reflects admin changes live
-  useEffect(() => {
-    if (!user) return;
-    const channel = supabase
-      .channel("baggage-tracker")
-      .on("postgres_changes", { event: "*", schema: "public", table: "baggage_reports", filter: `user_id=eq.${user.id}` }, () => load())
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
-    // eslint-disable-next-line
-  }, [user]);
-
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return reports;
-    return reports.filter(r =>
-      r.flight_number.toLowerCase().includes(q) ||
-      r.id.toLowerCase().startsWith(q) ||
-      r.passenger_name.toLowerCase().includes(q)
-    );
-  }, [reports, query]);
-
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const parsed = schema.safeParse(form);
-    if (!parsed.success) { toast.error(parsed.error.issues[0].message); return; }
-    setBusy(true);
-    const { error } = await supabase.from("baggage_reports").insert([{
-      flight_number: parsed.data.flight_number,
-      passenger_name: parsed.data.passenger_name,
-      description: parsed.data.description,
-      user_id: user!.id,
-    }]);
-    setBusy(false);
-    if (error) return toast.error(error.message);
-    toast.success("Reporte enviado");
-    setForm({ flight_number: "", passenger_name: "", description: "" });
-    load();
-  };
-
-  const stats = useMemo(() => ({
-    total: reports.length,
-    active: reports.filter(r => r.status === "open" || r.status === "investigating").length,
-    found: reports.filter(r => r.status === "found").length,
-  }), [reports]);
 
   return (
     <div className="container px-6 py-10 space-y-8">

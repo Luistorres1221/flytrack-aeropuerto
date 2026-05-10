@@ -13,6 +13,7 @@ type FlightHistory = { flight_number: string; status: string; created_at: string
 const Profile = () => {
   const { user, isAdmin } = useAuth();
   const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
   const [documentId, setDocumentId] = useState("");
   const [phone, setPhone] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
@@ -23,8 +24,11 @@ const Profile = () => {
   useEffect(() => {
     if (!user) return;
 
-    supabase.from("profiles").select("full_name").eq("id", user.id).maybeSingle()
-      .then(({ data }) => setFullName(data?.full_name ?? ""));
+    supabase.from("profiles").select("full_name, email").eq("id", user.id).maybeSingle()
+      .then(({ data }) => {
+        setFullName(data?.full_name ?? "");
+        setEmail(data?.email ?? user.email ?? "");
+      });
 
     supabase.from("passenger_profiles").select("document_id, phone, date_of_birth").eq("user_id", user.id).maybeSingle()
       .then(({ data }) => {
