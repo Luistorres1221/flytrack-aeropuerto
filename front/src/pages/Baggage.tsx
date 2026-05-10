@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { apiUrl } from "@/lib/apiUrl";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -91,7 +92,7 @@ const Baggage = () => {
 
   const load = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/equipajes`);
+      const response = await fetch(apiUrl("/api/equipajes"));
       if (!response.ok) throw new Error('Error al cargar equipajes');
       const data = await response.json();
       setEquipajes(data);
@@ -119,7 +120,7 @@ const Baggage = () => {
     if (!parsed.success) { toast.error(parsed.error.issues[0].message); return; }
     setBusy(true);
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/equipajes`, {
+      const response = await fetch(apiUrl("/api/equipajes"), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

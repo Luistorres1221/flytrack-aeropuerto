@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { apiUrl } from "@/lib/apiUrl";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -45,7 +46,7 @@ const Flights = () => {
 
   const load = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/vuelos`);
+      const response = await fetch(apiUrl("/api/vuelos"));
       if (!response.ok) {
         const message = `Error ${response.status}: ${response.statusText}`;
         setError(message);
