@@ -19,3 +19,17 @@ INSERT INTO vuelos (codigo_vuelo, origen, destino, fecha_salida, fecha_llegada, 
 ('FTK-118', 'Santa Marta', 'Bogotá', '2026-05-12 07:00:00', '2026-05-12 09:30:00', 'COMPLETADO', 'D2', 'T2', '2026-05-12 06:30:00', 'Satena', 180, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 ('FTK-119', 'Cúcuta', 'Medellín', '2026-05-12 10:00:00', '2026-05-12 12:45:00', 'RETRASADO', 'A1', 'T3', '2026-05-12 09:30:00', 'Easyfly', 170, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 ('FTK-120', 'Ibagué', 'Cartagena', '2026-05-12 13:00:00', '2026-05-12 16:30:00', 'PROGRAMADO', 'B5', 'T1', '2026-05-12 12:20:00', 'Viva Air Colombia', 160, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+-- Datos de pasajeros de prueba
+INSERT INTO pasajeros (documento, nombre, apellido, telefono, email, fecha_nacimiento, fecha_creacion, fecha_actualizacion) VALUES
+('12345678', 'Juan', 'Pérez', '+57 300 123 4567', 'juan.perez@email.com', '1990-05-15', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('87654321', 'María', 'García', '+57 301 987 6543', 'maria.garcia@email.com', '1985-08-22', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('11223344', 'Carlos', 'Rodríguez', '+57 302 555 1234', 'carlos.rodriguez@email.com', '1992-12-10', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+-- Datos de equipaje de prueba
+INSERT INTO equipajes (numero_etiqueta, descripcion, estado, vuelo_id, pasajero_id, fecha_creacion, fecha_actualizacion) VALUES
+('ABC123', 'Maleta negra con ruedas, marca Samsonite, contiene ropa y documentos', 'PERDIDO', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('DEF456', 'Bolso de mano azul, contiene laptop y accesorios electrónicos', 'ENCONTRADO', 2, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('GHI789', 'Maleta roja mediana, marca TravelPro, contiene zapatos y accesorios', 'ENTREGADO', 3, 3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('JKL012', 'Mochila deportiva negra, contiene artículos deportivos', 'PERDIDO', 4, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('MNO345', 'Maleta rígida plateada, contiene productos electrónicos', 'ENCONTRADO', 5, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
