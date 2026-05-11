@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { isSupabaseConfigured, supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,13 +23,13 @@ const Notifications = () => {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || !isSupabaseConfigured) return;
     supabase.from("notification_subscriptions").select("*").eq("user_id", user.id).maybeSingle()
       .then(({ data }) => { if (data) setSub(data as Sub); });
   }, [user]);
 
   const save = async () => {
-    if (!user) return;
+    if (!user || !isSupabaseConfigured) return;
     setBusy(true);
     const { error } = await supabase.from("notification_subscriptions").upsert({
       user_id: user.id, email: user.email!, ...sub,
@@ -45,24 +45,30 @@ const Notifications = () => {
         <CardContent className="space-y-4">
           <p className="text-sm text-muted-foreground">Te avisaremos a <strong>{user?.email}</strong>.</p>
 
+          {!isSupabaseConfigured && (
+            <p className="text-sm text-muted-foreground border border-border rounded-md p-3 bg-muted/40">
+              Las notificaciones por correo dependen de Supabase. En este despliegue solo está configurado el API (MySQL).
+            </p>
+          )}
+
           <div className="flex items-center justify-between border-b border-border pb-3">
             <Label htmlFor="enabled">Activar notificaciones</Label>
-            <Switch id="enabled" checked={sub.enabled} onCheckedChange={(v) => setSub({ ...sub, enabled: v })} />
+            <Switch id="enabled" checked={sub.enabled} onCheckedChange={(v) => setSub({ ...sub, enabled: v })} disabled={!isSupabaseConfigured} />
           </div>
           <div className="flex items-center justify-between">
             <Label>Cambio de puerta</Label>
-            <Switch checked={sub.notify_gate_change} onCheckedChange={(v) => setSub({ ...sub, notify_gate_change: v })} disabled={!sub.enabled} />
+            <Switch checked={sub.notify_gate_change} onCheckedChange={(v) => setSub({ ...sub, notify_gate_change: v })} disabled={!sub.enabled || !isSupabaseConfigured} />
           </div>
           <div className="flex items-center justify-between">
             <Label>Retrasos</Label>
-            <Switch checked={sub.notify_delay} onCheckedChange={(v) => setSub({ ...sub, notify_delay: v })} disabled={!sub.enabled} />
+            <Switch checked={sub.notify_delay} onCheckedChange={(v) => setSub({ ...sub, notify_delay: v })} disabled={!sub.enabled || !isSupabaseConfigured} />
           </div>
           <div className="flex items-center justify-between">
             <Label>Cancelaciones</Label>
-            <Switch checked={sub.notify_cancellation} onCheckedChange={(v) => setSub({ ...sub, notify_cancellation: v })} disabled={!sub.enabled} />
+            <Switch checked={sub.notify_cancellation} onCheckedChange={(v) => setSub({ ...sub, notify_cancellation: v })} disabled={!sub.enabled || !isSupabaseConfigured} />
           </div>
 
-          <Button onClick={save} disabled={busy} className="w-full">{busy ? "Guardando..." : "Guardar"}</Button>
+          <Button onClick={save} disabled={busy || !isSupabaseConfigured} className="w-full">{busy ? "Guardando..." : "Guardar"}</Button>
         </CardContent>
       </Card>
     </div>

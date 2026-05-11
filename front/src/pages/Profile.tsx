@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { isSupabaseConfigured, supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,6 +23,11 @@ const Profile = () => {
 
   useEffect(() => {
     if (!user) return;
+    if (!isSupabaseConfigured) {
+      setFullName(user.user_metadata?.full_name ?? "");
+      setEmail(user.email ?? "");
+      return;
+    }
 
     supabase.from("profiles").select("full_name, email").eq("id", user.id).maybeSingle()
       .then(({ data }) => {
@@ -46,6 +51,10 @@ const Profile = () => {
 
   const save = async () => {
     if (!user) return;
+    if (!isSupabaseConfigured) {
+      toast.info("Guardar datos del perfil en la nube requiere configurar Supabase.");
+      return;
+    }
     setBusy(true);
 
     try {
@@ -122,7 +131,10 @@ const Profile = () => {
             <Input type="date" value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)} />
           </div>
           <p className="text-sm text-muted-foreground">Rol: <strong>{isAdmin ? "Administrador" : "Usuario"}</strong></p>
-          <Button onClick={save} disabled={busy}>{busy ? "Guardando..." : "Guardar"}</Button>
+          <Button onClick={save} disabled={busy || !isSupabaseConfigured}>{busy ? "Guardando..." : "Guardar"}</Button>
+          {!isSupabaseConfigured && (
+            <p className="text-xs text-muted-foreground">Sin Supabase solo se muestran los datos básicos de la sesión.</p>
+          )}
         </CardContent>
       </Card>
 

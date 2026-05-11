@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { isSupabaseConfigured, supabase } from "@/integrations/supabase/client";
 import type { Session, User } from "@supabase/supabase-js";
 
 const ADMIN_EMAIL = "admin@flytrack.com";
@@ -54,7 +54,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signOut = async () => {
     localStorage.removeItem(LOCAL_ADMIN_STORAGE_KEY);
-    await supabase.auth.signOut();
+    if (isSupabaseConfigured) {
+      await supabase.auth.signOut();
+    }
     setSession(null);
     setUser(null);
     setIsAdmin(false);
@@ -62,6 +64,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const localUser = restoreLocalAdmin();
+
+    if (!isSupabaseConfigured) {
+      if (localUser) {
+        setSession(null);
+        setUser(localUser);
+        setIsAdmin(true);
+      } else {
+        setSession(null);
+        setUser(null);
+        setIsAdmin(false);
+      }
+      setLoading(false);
+      return;
+    }
 
     const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
       if (s?.user) {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { z } from "zod";
-import { supabase } from "@/integrations/supabase/client";
+import { isSupabaseConfigured, supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -34,6 +34,7 @@ const Passengers = () => {
   const [busy, setBusy] = useState(false);
 
   const load = async () => {
+    if (!isSupabaseConfigured) return;
     const { data: ps } = await supabase
       .from("passenger_profiles")
       .select("*")
@@ -50,10 +51,16 @@ const Passengers = () => {
     }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    if (isSupabaseConfigured) load();
+  }, []);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isSupabaseConfigured) {
+      toast.error("Esta sección requiere Supabase (auth y edge functions).");
+      return;
+    }
     const parsed = schema.safeParse(form);
     if (!parsed.success) { toast.error(parsed.error.issues[0].message); return; }
     setBusy(true);
@@ -72,6 +79,15 @@ const Passengers = () => {
 
   return (
     <div className="space-y-6">
+      {!isSupabaseConfigured && (
+        <Card>
+          <CardContent className="pt-6">
+            <p className="text-sm text-muted-foreground">
+              Esta sección usa Supabase (auth y datos). Para gestionar pasajeros solo con MySQL/API habría que exponer endpoints en el backend; con el despliegue actual solo está activo el API REST.
+            </p>
+          </CardContent>
+        </Card>
+      )}
       <Card>
         <CardHeader><CardTitle>Crear cuenta de pasajero</CardTitle></CardHeader>
         <CardContent>
@@ -101,7 +117,7 @@ const Passengers = () => {
               <Input type="date" value={form.date_of_birth} onChange={(e) => setForm({ ...form, date_of_birth: e.target.value })} />
             </div>
             <div className="md:col-span-2">
-              <Button type="submit" disabled={busy}>{busy ? "Creando..." : "Crear pasajero"}</Button>
+              <Button type="submit" disabled={busy || !isSupabaseConfigured}>{busy ? "Creando..." : "Crear pasajero"}</Button>
             </div>
           </form>
         </CardContent>
