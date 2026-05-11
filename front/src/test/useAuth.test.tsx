@@ -1,51 +1,64 @@
 import { renderHook, act, waitFor } from "@testing-library/react";
+import { vi } from "vitest";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
 
-// Mock Supabase
-jest.mock("@/integrations/supabase/client", () => ({
+const authMocks = vi.hoisted(() => {
+  const getSession = vi.fn().mockResolvedValue({ data: { session: null } });
+  const signOut = vi.fn().mockResolvedValue(undefined);
+  const unsubscribe = vi.fn();
+  const onAuthStateChange = vi.fn(() => ({
+    data: { subscription: { unsubscribe } },
+  }));
+  return { getSession, signOut, unsubscribe, onAuthStateChange };
+});
+
+vi.mock("@/integrations/supabase/client", () => ({
+  isSupabaseConfigured: true,
   supabase: {
     auth: {
-      getSession: jest.fn(),
-      onAuthStateChange: jest.fn(() => ({
-        data: { subscription: { unsubscribe: jest.fn() } }
-      })),
-      signOut: jest.fn()
-    }
-  }
+      getSession: authMocks.getSession,
+      onAuthStateChange: authMocks.onAuthStateChange,
+      signOut: authMocks.signOut,
+    },
+  },
 }));
 
-// Mock localStorage
 const localStorageMock = {
-  getItem: jest.fn(),
-  setItem: jest.fn(),
-  removeItem: jest.fn(),
-  clear: jest.fn(),
+  getItem: vi.fn(),
+  setItem: vi.fn(),
+  removeItem: vi.fn(),
+  clear: vi.fn(),
 };
-Object.defineProperty(window, 'localStorage', {
-  value: localStorageMock
+Object.defineProperty(window, "localStorage", {
+  value: localStorageMock,
+  writable: true,
 });
 
 describe("useAuth", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     localStorageMock.getItem.mockReturnValue(null);
+    authMocks.getSession.mockResolvedValue({ data: { session: null } });
   });
 
-  it("should initialize with loading state", () => {
+  it("should initialize with loading state", async () => {
     const { result } = renderHook(() => useAuth(), {
-      wrapper: AuthProvider
+      wrapper: AuthProvider,
     });
 
     expect(result.current.loading).toBe(true);
     expect(result.current.user).toBe(null);
     expect(result.current.session).toBe(null);
     expect(result.current.isAdmin).toBe(false);
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
   });
 
   it("should handle local admin login", async () => {
     const { result } = renderHook(() => useAuth(), {
-      wrapper: AuthProvider
+      wrapper: AuthProvider,
     });
 
     act(() => {
@@ -66,7 +79,7 @@ describe("useAuth", () => {
     localStorageMock.getItem.mockReturnValue("true");
 
     const { result } = renderHook(() => useAuth(), {
-      wrapper: AuthProvider
+      wrapper: AuthProvider,
     });
 
     expect(result.current.user?.email).toBe("admin@flytrack.com");
@@ -77,7 +90,7 @@ describe("useAuth", () => {
     localStorageMock.getItem.mockReturnValue("true");
 
     const { result } = renderHook(() => useAuth(), {
-      wrapper: AuthProvider
+      wrapper: AuthProvider,
     });
 
     await act(async () => {

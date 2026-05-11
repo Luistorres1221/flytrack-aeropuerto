@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { apiUrl } from "@/lib/apiUrl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -40,10 +41,11 @@ const Admin = () => {
 
   const loadFlights = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/vuelos`);
+      const response = await fetch(apiUrl("/api/vuelos"));
       if (!response.ok) throw new Error('Error al cargar vuelos');
       const data = await response.json();
-      const mappedFlights = data.map((v: any) => ({
+      const list = Array.isArray(data) ? data : [];
+      const mappedFlights = list.map((v: any) => ({
         id: v.id.toString(),
         flight_number: v.codigoVuelo,
         origin: v.origen,
@@ -65,10 +67,10 @@ const Admin = () => {
 
   const loadEquipajes = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/equipajes`);
+      const response = await fetch(apiUrl("/api/equipajes"));
       if (!response.ok) throw new Error('Error al cargar equipajes');
       const data = await response.json();
-      setEquipajes(data);
+      setEquipajes(Array.isArray(data) ? data : []);
     } catch (error) {
       toast.error('Error al cargar equipajes');
       console.error(error);
@@ -85,7 +87,7 @@ const Admin = () => {
       if (patch.terminal !== undefined) apiPatch.terminal = patch.terminal;
       if (patch.status !== undefined) apiPatch.estado = patch.status;
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/vuelos/${id}`, {
+      const response = await fetch(apiUrl(`/api/vuelos/${id}`), {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(apiPatch)
@@ -102,7 +104,7 @@ const Admin = () => {
 
   const updateEquipaje = async (id: string, patch: Partial<Equipaje>) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/equipajes/${id}`, {
+      const response = await fetch(apiUrl(`/api/equipajes/${id}`), {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(patch)

@@ -1,4 +1,5 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { vi } from "vitest";
 import type { ReactNode } from "react";
@@ -28,8 +29,12 @@ describe("Admin", () => {
     fetchMock.mockResolvedValue({ ok: true, json: async () => [] });
   });
 
-  it("should render admin panel with tabs", () => {
+  it("should render admin panel with tabs", async () => {
     render(<Admin />, { wrapper });
+
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalled();
+    });
 
     expect(screen.getByText("Administración")).toBeInTheDocument();
     expect(screen.getByText("Vuelos")).toBeInTheDocument();
@@ -82,20 +87,17 @@ describe("Admin", () => {
       }
     ];
 
-    fetchMock
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => [],
-      })
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockBaggage,
-      });
+    fetchMock.mockImplementation((url: string) => {
+      if (typeof url === "string" && url.includes("/api/equipajes")) {
+        return Promise.resolve({ ok: true, json: async () => mockBaggage });
+      }
+      return Promise.resolve({ ok: true, json: async () => [] });
+    });
 
+    const user = userEvent.setup();
     render(<Admin />, { wrapper });
 
-    // Switch to baggage tab
-    fireEvent.click(screen.getByRole("tab", { name: /equipaje/i }));
+    await user.click(screen.getByRole("tab", { name: "Reportes equipaje" }));
 
     await waitFor(() => {
       expect(screen.getByText("EQ123")).toBeInTheDocument();
@@ -105,12 +107,18 @@ describe("Admin", () => {
   });
 
   it("should handle API errors", async () => {
-    fetchMock.mockRejectedValueOnce(new Error("Network error"));
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
 
-    render(<Admin />, { wrapper });
+    try {
+      fetchMock.mockRejectedValueOnce(new Error("Network error"));
 
-    await waitFor(() => {
-      expect(fetchMock).toHaveBeenCalled();
-    });
+      render(<Admin />, { wrapper });
+
+      await waitFor(() => {
+        expect(fetchMock).toHaveBeenCalled();
+      });
+    } finally {
+      consoleError.mockRestore();
+    }
   });
 });

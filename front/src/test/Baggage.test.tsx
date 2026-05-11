@@ -28,10 +28,14 @@ describe("Baggage", () => {
     fetchMock.mockResolvedValue({ ok: true, json: async () => [] });
   });
 
-  it("should render baggage tracking form", () => {
+  it("should render baggage tracking form", async () => {
     render(<Baggage />, { wrapper });
 
-    expect(screen.getByText("Rastreo de Equipaje")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledWith("http://localhost:8090/api/equipajes");
+    });
+
+    expect(screen.getByRole("heading", { name: /rastreo de equipaje/i })).toBeInTheDocument();
     expect(screen.getByLabelText(/número de etiqueta/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/descripción/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/id del vuelo/i)).toBeInTheDocument();
@@ -128,29 +132,35 @@ describe("Baggage", () => {
   });
 
   it("should handle API errors gracefully", async () => {
-    fetchMock
-      .mockResolvedValueOnce({ ok: true, json: async () => [] })
-      .mockResolvedValueOnce({ ok: false, json: async () => ({ message: "Error del servidor" }) });
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
 
-    render(<Baggage />, { wrapper });
+    try {
+      fetchMock
+        .mockResolvedValueOnce({ ok: true, json: async () => [] })
+        .mockResolvedValueOnce({ ok: false, json: async () => ({ message: "Error del servidor" }) });
 
-    fireEvent.change(screen.getByLabelText(/número de etiqueta/i), {
-      target: { value: "EQ123" },
-    });
-    fireEvent.change(screen.getByLabelText(/descripción/i), {
-      target: { value: "Maleta negra" },
-    });
-    fireEvent.change(screen.getByLabelText(/id del vuelo/i), {
-      target: { value: "1" },
-    });
-    fireEvent.change(screen.getByLabelText(/id del pasajero/i), {
-      target: { value: "1" },
-    });
+      render(<Baggage />, { wrapper });
 
-    fireEvent.click(screen.getByRole("button", { name: /registrar equipaje/i }));
+      fireEvent.change(screen.getByLabelText(/número de etiqueta/i), {
+        target: { value: "EQ123" },
+      });
+      fireEvent.change(screen.getByLabelText(/descripción/i), {
+        target: { value: "Maleta negra" },
+      });
+      fireEvent.change(screen.getByLabelText(/id del vuelo/i), {
+        target: { value: "1" },
+      });
+      fireEvent.change(screen.getByLabelText(/id del pasajero/i), {
+        target: { value: "1" },
+      });
 
-    await waitFor(() => {
-      expect(fetchMock).toHaveBeenCalledTimes(2);
-    });
+      fireEvent.click(screen.getByRole("button", { name: /registrar equipaje/i }));
+
+      await waitFor(() => {
+        expect(fetchMock).toHaveBeenCalledTimes(2);
+      });
+    } finally {
+      consoleError.mockRestore();
+    }
   });
 });

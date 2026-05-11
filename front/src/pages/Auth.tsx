@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
-import { supabase } from "@/integrations/supabase/client";
+import { isSupabaseConfigured, supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,6 +38,21 @@ const Auth = () => {
     }
     setBusy(true);
     try {
+      if (!isSupabaseConfigured) {
+        if (mode === "signup") {
+          toast.error("El registro con correo requiere configurar Supabase en el despliegue.");
+          return;
+        }
+        if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+          loginLocalAdmin();
+          toast.success("Bienvenido administrador");
+          nav("/");
+          return;
+        }
+        toast.error("Inicio de sesión con correo requiere Supabase. Usa la cuenta de administrador local o configura las variables VITE_SUPABASE_*.");
+        return;
+      }
+
       if (mode === "signup") {
         if (email === ADMIN_EMAIL) {
           toast.error("La cuenta de administrador ya está protegida y no puede registrarse aquí.");

@@ -1,5 +1,5 @@
 import { defineConfig } from "vitest/config";
-import react from "@vitejs/plugin-react-swc";
+import react from "@vitejs/plugin-react";
 import path from "path";
 
 export default defineConfig({
@@ -9,6 +9,12 @@ export default defineConfig({
     globals: true,
     setupFiles: ["./src/test/setup.ts"],
     include: ["src/**/*.{test,spec}.{ts,tsx}"],
+    env: {
+      VITE_API_URL: "http://localhost:8090",
+      VITE_SUPABASE_URL: "https://test.supabase.co",
+      VITE_SUPABASE_PUBLISHABLE_KEY: "test-anon-key",
+      VITE_SUPABASE_PROJECT_ID: "test",
+    },
   },
   resolve: {
     alias: { "@": path.resolve(__dirname, "./src") },

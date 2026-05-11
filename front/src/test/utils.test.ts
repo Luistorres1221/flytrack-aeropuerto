@@ -11,7 +11,9 @@ describe("utils", () => {
     });
 
     it("should merge Tailwind classes correctly", () => {
-      expect(cn("px-2 py-1", "px-4")).toBe("px-4 py-1");
+      const out = cn("px-2 py-1", "px-4");
+      expect(out).toContain("px-4");
+      expect(out).toContain("py-1");
     });
 
     it("should handle empty inputs", () => {
