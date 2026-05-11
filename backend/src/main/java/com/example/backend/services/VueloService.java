@@ -48,6 +48,10 @@ public class VueloService {
         vuelo.setFechaSalida(vueloDetails.getFechaSalida());
         vuelo.setFechaLlegada(vueloDetails.getFechaLlegada());
         vuelo.setEstado(vueloDetails.getEstado());
+        vuelo.setPuerta(vueloDetails.getPuerta());
+        vuelo.setTerminal(vueloDetails.getTerminal());
+        vuelo.setHoraAbordaje(vueloDetails.getHoraAbordaje());
+        vuelo.setAerolinea(vueloDetails.getAerolinea());
         vuelo.setCapacidad(vueloDetails.getCapacidad());
 
         return vueloRepository.save(vuelo);

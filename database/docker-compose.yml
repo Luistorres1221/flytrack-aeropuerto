@@ -25,6 +25,8 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/aeropuerto_db
       SPRING_DATASOURCE_USERNAME: aeropuerto_user
       SPRING_DATASOURCE_PASSWORD: securepassword
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+      SPRING_FLYWAY_ENABLED: true
 
   frontend:
     build: ../frontend

@@ -50,10 +50,10 @@ public class Vuelo {
     @NotNull(message = "La hora de abordaje es obligatoria")
     @Column(name = "hora_abordaje")
     private LocalDateTime horaAbordaje;
-    @NotBlank(message = "La aerolínea es obligatoria")
-    @Size(min = 2, max = 50, message = "La aerolínea debe tener entre 2 y 50 caracteres")
-    @Column(name = "aerolinea")
-    private String aerolinea;
+    @NotNull(message = "La aerolínea es obligatoria")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "aerolinea_id", nullable = false)
+    private Aerolinea aerolinea;
     @Min(value = 1, message = "La capacidad debe ser al menos 1")
     private Integer capacidad;
 
@@ -163,11 +163,11 @@ public class Vuelo {
         this.horaAbordaje = horaAbordaje;
     }
 
-    public String getAerolinea() {
+    public Aerolinea getAerolinea() {
         return aerolinea;
     }
 
-    public void setAerolinea(String aerolinea) {
+    public void setAerolinea(Aerolinea aerolinea) {
         this.aerolinea = aerolinea;
     }
 

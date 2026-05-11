@@ -1,5 +1,6 @@
 package com.example.backend.controller;
 
+import com.example.backend.models.Aerolinea;
 import com.example.backend.models.Vuelo;
 import com.example.backend.models.Vuelo.EstadoVuelo;
 import com.example.backend.services.VueloService;
@@ -133,7 +134,16 @@ class VueloControllerTest {
         vuelo.setEstado(EstadoVuelo.PROGRAMADO);
         vuelo.setPuerta("A1");
         vuelo.setTerminal("T1");
-        vuelo.setAerolinea("Test Airline");
+        vuelo.setHoraAbordaje(LocalDateTime.now().plusMinutes(30));
+        vuelo.setCapacidad(150);
+
+        Aerolinea aerolinea = new Aerolinea();
+        aerolinea.setId(1L);
+        aerolinea.setNombre("Test Airline");
+        aerolinea.setCodigoIata("TA");
+        aerolinea.setPais("Colombia");
+        vuelo.setAerolinea(aerolinea);
+
         return vuelo;
     }
 }

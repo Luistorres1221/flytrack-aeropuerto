@@ -1,5 +1,6 @@
 package com.example.backend.model;
 
+import com.example.backend.models.Aerolinea;
 import com.example.backend.models.Vuelo;
 import com.example.backend.models.Vuelo.EstadoVuelo;
 import org.junit.jupiter.api.Test;
@@ -28,7 +29,15 @@ class VueloTest {
         vuelo.setEstado(EstadoVuelo.PROGRAMADO);
         vuelo.setPuerta("A1");
         vuelo.setTerminal("T1");
-        vuelo.setAerolinea("Iberia");
+        vuelo.setHoraAbordaje(LocalDateTime.now().plusMinutes(30));
+        vuelo.setCapacidad(150);
+
+        Aerolinea aerolinea = new Aerolinea();
+        aerolinea.setId(1L);
+        aerolinea.setNombre("Iberia");
+        aerolinea.setCodigoIata("IB");
+        aerolinea.setPais("España");
+        vuelo.setAerolinea(aerolinea);
 
         assertEquals("ABC123", vuelo.getCodigoVuelo());
         assertEquals("Madrid", vuelo.getOrigen());
@@ -36,7 +45,7 @@ class VueloTest {
         assertEquals(EstadoVuelo.PROGRAMADO, vuelo.getEstado());
         assertEquals("A1", vuelo.getPuerta());
         assertEquals("T1", vuelo.getTerminal());
-        assertEquals("Iberia", vuelo.getAerolinea());
+        assertEquals(aerolinea, vuelo.getAerolinea());
     }
 
     @Test
@@ -65,7 +74,15 @@ class VueloTest {
         vuelo.setEstado(EstadoVuelo.PROGRAMADO);
         vuelo.setPuerta("A1");
         vuelo.setTerminal("T1");
-        vuelo.setAerolinea("Iberia");
+        vuelo.setHoraAbordaje(LocalDateTime.now().plusMinutes(30));
+        vuelo.setCapacidad(150);
+
+        Aerolinea aerolinea = new Aerolinea();
+        aerolinea.setId(1L);
+        aerolinea.setNombre("Iberia");
+        aerolinea.setCodigoIata("IB");
+        aerolinea.setPais("España");
+        vuelo.setAerolinea(aerolinea);
 
         Set<ConstraintViolation<Vuelo>> violations = validator.validate(vuelo);
 

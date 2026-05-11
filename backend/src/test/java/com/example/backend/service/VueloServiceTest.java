@@ -1,5 +1,6 @@
 package com.example.backend.service;
 
+import com.example.backend.models.Aerolinea;
 import com.example.backend.models.Vuelo;
 import com.example.backend.models.Vuelo.EstadoVuelo;
 import com.example.backend.repository.VueloRepository;
@@ -7,10 +8,9 @@ import com.example.backend.services.VueloService;
 import com.example.backend.exceptions.ResourceNotFoundException;
 import com.example.backend.exceptions.ResourceAlreadyExistsException;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -21,13 +21,13 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
 class VueloServiceTest {
 
-    @Mock
+    @MockBean
     private VueloRepository vueloRepository;
 
-    @InjectMocks
+    @Autowired
     private VueloService vueloService;
 
     @Test
@@ -142,7 +142,16 @@ class VueloServiceTest {
         vuelo.setEstado(EstadoVuelo.PROGRAMADO);
         vuelo.setPuerta("A1");
         vuelo.setTerminal("T1");
-        vuelo.setAerolinea("Test Airline");
+        vuelo.setHoraAbordaje(LocalDateTime.now().plusMinutes(30));
+        vuelo.setCapacidad(150);
+
+        Aerolinea aerolinea = new Aerolinea();
+        aerolinea.setId(1L);
+        aerolinea.setNombre("Test Airline");
+        aerolinea.setCodigoIata("TA");
+        aerolinea.setPais("Colombia");
+        vuelo.setAerolinea(aerolinea);
+
         return vuelo;
     }
 }
